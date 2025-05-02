@@ -14,6 +14,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-hardware.url = "github:nixos/nixos-hardware";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs =
@@ -25,7 +26,9 @@
       ...
     }@inputs:
     {
-      nixosModules = import ./modules { };
+      lib = import ./lib inputs;
+      packages = import ./pkgs inputs;
+      nixosModules = import ./modules inputs;
       nixosConfigurations = import ./hosts inputs;
     };
 }
