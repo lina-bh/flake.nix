@@ -21,35 +21,35 @@
         "flakes"
       ];
       extra-trusted-users = [ "@wheel" ];
-      cores = 0;
-      max-jobs = 1;
+      cores = 1;
+      max-jobs = 2;
       auto-optimise-store = true;
     };
   };
 
-  users.users.lina = {
-    isNormalUser = true;
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-      "libvirtd"
-      "vboxusers"
-    ];
-  };
+  nixpkgs.config.allowUnfree = true;
 
   environment = {
-    variables.EDITOR = "nvim";
+    variables.EDITOR = "vi";
     systemPackages = with pkgs; [
-      neovim-unwrapped
-      fish
-      git
-      htop
-      unzip
-      libarchive
-      file
+      config.boot.kernelPackages.perf
       fd
-      ripgrep
+      file
+      git
+      gnumake
+      hdparm
+      htop
       ldns
+      libarchive
+      neovim-unwrapped
+      nixfmt-rfc-style
+      nvme-cli
+      pv
+      python3
+      ripgrep
+      smartmontools
+      sysfsutils
+      unzip
     ];
   };
 
@@ -68,9 +68,9 @@
   };
 
   documentation = {
-    nixos.enable = false;
+    nixos.enable = lib.mkDefault false;
+    doc.enable = lib.mkDefault false;
     info.enable = false;
-    doc.enable = false;
   };
 
   virtualisation.podman = {
@@ -83,4 +83,33 @@
     "r /root/.nix-defexpr/channels"
     "R /nix/var/nix/profiles/per-user/root/channels"
   ];
+
+  system.rebuild.enableNg = true;
+
+  users.users.lina = {
+    isNormalUser = true;
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+      "libvirtd"
+      "vboxusers"
+      "docker"
+      "adbusers"
+    ];
+  };
+
+  home-manager.users.lina =
+    { pkgs, ... }:
+    {
+      programs = {
+        bun.enable = true;
+        bun.enableGitIntegration = false;
+        uv.enable = true;
+      };
+
+      home.packages = with pkgs; [
+        rustup
+        distrobox
+      ];
+    };
 }

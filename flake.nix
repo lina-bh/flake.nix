@@ -15,20 +15,17 @@
     nixos-hardware.url = "github:nixos/nixos-hardware";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs =
-    {
-      self,
-      chaotic ? null,
-      nixpkgs,
-      nixos-hardware,
-      ...
-    }@inputs:
-    {
-      lib = import ./lib inputs;
-      packages = import ./pkgs inputs;
-      nixosModules = import ./modules inputs;
-      nixosConfigurations = import ./hosts inputs;
-    };
+  outputs = inputs: {
+    lib = import ./lib inputs;
+    packages = import ./pkgs inputs;
+    nixosModules = import ./modules inputs;
+    nixosConfigurations = import ./hosts inputs;
+  };
 }

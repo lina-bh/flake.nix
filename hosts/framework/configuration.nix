@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   modulesPath,
@@ -15,7 +16,10 @@
 
   boot = {
     loader = {
-      systemd-boot.enable = true;
+      systemd-boot = {
+        enable = true;
+        memtest86.enable = true;
+      };
       efi.canTouchEfiVariables = true;
     };
     kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
@@ -28,6 +32,7 @@
       "amdxdna"
     ];
     initrd = {
+      # systemd.enable = null;
       luks.devices."crypt".device = "/dev/disk/by-uuid/bbf40d28-ade8-4213-b342-bf669ec23e75";
     };
   };
@@ -39,12 +44,15 @@
       options = [
         "noatime"
         "lazytime"
+        "compress-force=zstd:1"
       ];
     };
     "/boot" = {
       device = "/dev/disk/by-label/EFI";
       fsType = "vfat";
       options = [
+        "nodev"
+        "noexec"
         "noatime"
         "fmask=0077"
         "dmask=0077"
@@ -58,22 +66,23 @@
   services = {
     hardware.bolt.enable = true;
     fwupd.enable = true;
-    displayManager.autoLogin = {
-      enable = true;
-      user = "lina";
-    };
     scx = {
       package = lib.mkDefault pkgs.scx.rustscheds;
       loader = {
         enable = true;
         config = {
-          default_sched = "scx_bpfland";
+          default_sched = "scx_lavd";
         };
       };
     };
   };
 
+  environment = {
+    variables.KWIN_FORCE_ASSUME_HDR_SUPPORT = "1";
+  };
+
   virtualisation.virtualbox.host.enable = true;
 
   system.stateVersion = "24.11";
+  home-manager.users.lina.home.stateVersion = "24.11";
 }

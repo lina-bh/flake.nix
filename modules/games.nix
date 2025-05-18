@@ -1,12 +1,5 @@
 { pkgs, lib, ... }:
 {
-  nixpkgs.config.allowUnfreePredicate =
-    pkg:
-    builtins.elem (lib.getName pkg) [
-      "steam"
-      "steam-unwrapped"
-    ];
-
   i18n.extraLocales = [ "en_US.UTF-8" ];
 
   programs.steam = {
@@ -15,5 +8,19 @@
 
   environment.systemPackages = with pkgs; [
     mangohud
+    lact
+    gamescope
   ];
+
+  systemd = {
+    packages = with pkgs; [ lact ];
+    services.lactd.wantedBy = [ "graphical.target" ];
+  };
+
+  services.sunshine = {
+    enable = true;
+    capSysAdmin = true;
+    openFirewall = true;
+    autoStart = false;
+  };
 }

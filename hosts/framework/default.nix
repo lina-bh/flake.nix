@@ -5,24 +5,29 @@
   ...
 }:
 let
-  nixosModules.gamescope_git = (
-    let
-      chaoticPkgs = chaotic.legacyPackages.x86_64-linux;
-    in
-    {
-      environment.systemPackages = [
-        chaoticPkgs.gamescope_git
+  chaoticPkgs = chaotic.legacyPackages.x86_64-linux;
+  nixosModules.gamescope_git = {
+    environment.systemPackages = [
+      chaoticPkgs.gamescope_git
+    ];
+    hardware.graphics = {
+      extraPackages = [
+        chaoticPkgs.gamescope-wsi_git
       ];
-      hardware.graphics = {
-        extraPackages = [
-          chaoticPkgs.gamescope-wsi_git
-        ];
-        extraPackages32 = [
-          chaoticPkgs.gamescope-wsi32_git
-        ];
-      };
-    }
-  );
+      extraPackages32 = [
+        chaoticPkgs.gamescope-wsi32_git
+      ];
+    };
+  };
+  nixosModules.cachyos_kernel = {
+    boot.kernelPackages = chaotic.legacyPackages.x86_64-linux.linuxPackages_cachyos;
+  };
+  nixosModules.mesa_git = {
+    hardware.graphics = {
+      package = chaoticPkgs.mesa_git;
+      package32 = chaoticPkgs.mesa32_git;
+    };
+  };
 in
 {
   system = "x86_64-linux";
@@ -33,7 +38,8 @@ in
     self.nixosModules.desktop
     self.nixosModules.games
     self.nixosModules.development
+    self.nixosModules.user
     ./configuration.nix
-    nixosModules.gamescope_git
+    nixosModules.mesa_git
   ];
 }

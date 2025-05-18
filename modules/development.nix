@@ -1,29 +1,23 @@
-{ pkgs, config, ... }:
-let
-  devcontainer = pkgs.devcontainer.override {
-    docker = pkgs.podman;
-    docker-compose = null;
-  };
-in
+{ pkgs, ... }:
 {
-  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+  virtualisation = {
+    docker = {
+      enable = true;
+      storageDriver = "overlay2";
+      enableOnBoot = false;
+    };
+  };
 
-  environment.systemPackages =
-    (with pkgs; [
-      config.boot.kernelPackages.perf
-      direnv
-      rustup
-      gnumake
-      man-pages
-      nixfmt-rfc-style
-      stylua
-      jujutsu
-      shellcheck
-      neovim-unwrapped.lua
-    ])
-    ++ [
-      devcontainer
-    ];
-
-  # documentation.dev.enable = true;
+  home-manager.users.lina =
+    { pkgs, ... }:
+    {
+      home.packages = with pkgs; [
+        direnv
+        pandoc
+        nil
+        nix-tree
+        nixd
+        rustup
+      ];
+    };
 }
